@@ -25,4 +25,7 @@ public interface BookService {
 
     void deleteById(Long id);
 
+    Optional<Book> markAsTaken(Long id,String name, Category category, Long author, Integer availableCopies);
+
+    Optional<Book> markAsTaken(Long id, BookDto bookDto);
 }

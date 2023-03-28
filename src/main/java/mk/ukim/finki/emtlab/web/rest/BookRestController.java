@@ -44,6 +44,13 @@ public class BookRestController {
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
+    @PostMapping("/taken/{id}")
+    public ResponseEntity<Book> markAsTaken(@RequestBody BookDto bookDto) {
+        return this.bookService.save(bookDto)
+                .map(book -> ResponseEntity.ok().body(book))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity deleteById(@PathVariable Long id) {
         this.bookService.deleteById(id);

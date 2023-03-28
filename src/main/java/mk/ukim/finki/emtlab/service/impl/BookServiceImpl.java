@@ -98,4 +98,35 @@ public class BookServiceImpl implements BookService {
     public void deleteById(Long id) {
         this.bookRepository.deleteById(id);
     }
+
+    @Override
+    public Optional<Book> markAsTaken(Long id,String name, Category category, Long authorId, Integer availableCopies) {
+        Book book = this.bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+
+        book.setName(name);
+        book.setCategory(category);
+        book.setAvailableCopies(availableCopies - 1);
+        Author author = this.authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
+        book.setAuthor(author);
+
+        this.bookRepository.save(book);
+        return Optional.of(book);
+    }
+
+    @Override
+    public Optional<Book> markAsTaken(Long id, BookDto bookDto) {
+        Book book = this.bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+
+        book.setName(bookDto.getName());
+        book.setCategory(bookDto.getCategory());
+        book.setAvailableCopies(bookDto.getAvailableCopies() - 1);
+        Author author = this.authorRepository.findById(bookDto.getAuthor()).orElseThrow(() -> new AuthorNotFoundException(bookDto.getAuthor()));
+        book.setAuthor(author);
+
+        this.bookRepository.save(book);
+        return Optional.of(book);
+    }
+
+
+
 }

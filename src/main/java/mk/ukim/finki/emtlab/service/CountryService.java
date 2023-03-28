@@ -12,6 +12,6 @@ public interface CountryService {
 
     void delete(String name);
 
-    List<Country> listCountries();
+    List<Country> findAll();
 
 }

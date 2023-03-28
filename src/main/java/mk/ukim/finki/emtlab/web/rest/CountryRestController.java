@@ -20,6 +20,6 @@ public class CountryRestController {
     }
 
     public List<Country> findAll() {
-        return this.countryService.listCountries();
+        return this.countryService.findAll();
     }
 }
