@@ -44,9 +44,9 @@ public class BookRestController {
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
-    @PostMapping("/taken/{id}")
-    public ResponseEntity<Book> markAsTaken(@RequestBody BookDto bookDto) {
-        return this.bookService.save(bookDto)
+    @PutMapping("/taken/{id}")
+    public ResponseEntity<Book> markAsTaken(@PathVariable Long id, @RequestBody BookDto bookDto) {
+        return this.bookService.markAsTaken(id, bookDto)
                 .map(book -> ResponseEntity.ok().body(book))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
