@@ -1,31 +1,25 @@
 package mk.ukim.finki.emtlab.service;
 
-import mk.ukim.finki.emtlab.model.Author;
 import mk.ukim.finki.emtlab.model.Book;
-import mk.ukim.finki.emtlab.model.Category;
 import mk.ukim.finki.emtlab.model.dto.BookDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
-
 public interface BookService {
-    List<Book> findAll();
+
+    List<Book> listBooks();
+
+    Page<Book> listBooksPaginated(Pageable pageable);
 
     Optional<Book> findById(Long id);
 
-    Optional<Book> findByName(String name);
+    Optional<Book> create(BookDto bookDto);
 
-    Optional<Book> save(String name, Category category, Long author, Integer availableCopies);
-
-    Optional<Book> save(BookDto bookDto);
-
-    Optional<Book> edit(Long id, String name, Category category, Long author, Integer availableCopies);
-
-    Optional<Book> edit(Long id, BookDto bookDto);
+    Optional<Book> update(Long id, BookDto bookDto);
 
     void deleteById(Long id);
 
-    Optional<Book> markAsTaken(Long id,String name, Category category, Long author, Integer availableCopies);
-
-    Optional<Book> markAsTaken(Long id, BookDto bookDto);
+    Optional<Book> take(Long id);
 }

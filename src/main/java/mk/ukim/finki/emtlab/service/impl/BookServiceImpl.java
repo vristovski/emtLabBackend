@@ -1,33 +1,36 @@
 package mk.ukim.finki.emtlab.service.impl;
 
+import lombok.AllArgsConstructor;
 import mk.ukim.finki.emtlab.model.Author;
 import mk.ukim.finki.emtlab.model.Book;
-import mk.ukim.finki.emtlab.model.Category;
 import mk.ukim.finki.emtlab.model.dto.BookDto;
 import mk.ukim.finki.emtlab.model.exceptions.AuthorNotFoundException;
 import mk.ukim.finki.emtlab.model.exceptions.BookNotFoundException;
 import mk.ukim.finki.emtlab.repository.AuthorRepository;
 import mk.ukim.finki.emtlab.repository.BookRepository;
 import mk.ukim.finki.emtlab.service.BookService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
 
-    public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository) {
-        this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
+    @Override
+    public List<Book> listBooks() {
+        return this.bookRepository.findAll();
     }
 
     @Override
-    public List<Book> findAll() {
-        return this.bookRepository.findAll();
+    public Page<Book> listBooksPaginated(Pageable pageable) {
+        return this.bookRepository.findAll(pageable);
     }
 
     @Override
@@ -36,62 +39,26 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<Book> findByName(String name) {
-        return this.bookRepository.findByName(name);
+    public Optional<Book> create(BookDto bookDto) {
+        Author author = this.authorRepository.findById(bookDto.getAuthor())
+                .orElseThrow(AuthorNotFoundException::new);
+        return Optional.of(this.bookRepository
+                .save(new Book(bookDto.getName(), bookDto.getCategory(), author, bookDto.getAvailableCopies())));
     }
 
     @Override
-    public Optional<Book> save(String name, Category category, Long authorId, Integer availableCopies) {
-        Author author = this.authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
-
-        this.bookRepository.deleteByName(name);
-        Book book = new Book(name, category, author,availableCopies);
-        this.bookRepository.save(book);
-
-        return Optional.of(book);
-
-    }
-
-    @Override
-    public Optional<Book> save(BookDto bookDto) {
-        Author author = this.authorRepository.findById(bookDto.getAuthor()).orElseThrow(() -> new AuthorNotFoundException(bookDto.getAuthor()));
-
-        this.bookRepository.deleteByName(bookDto.getName());
-        Book book = new Book(bookDto.getName(), bookDto.getCategory(), author, bookDto.getAvailableCopies());
-
-        this.bookRepository.save(book);
-        return Optional.of(book);
-    }
-
-    @Override
-    public Optional<Book> edit(Long id, String name, Category category, Long authorId, Integer availableCopies) {
-       Book book = this.bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-
-       book.setName(name);
-       book.setCategory(category);
-       book.setAvailableCopies(availableCopies);
-
-        Author author = this.authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
-        book.setAuthor(author);
-
-        this.bookRepository.save(book);
-
-        return Optional.of(book);
-    }
-
-    @Override
-    public Optional<Book> edit(Long id, BookDto bookDto) {
-        Book book = this.bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+    public Optional<Book> update(Long id, BookDto bookDto) {
+        Book book = this.bookRepository.findById(id)
+                .orElseThrow(BookNotFoundException::new);
+        Author author = this.authorRepository.findById(bookDto.getAuthor())
+                .orElseThrow(AuthorNotFoundException::new);
 
         book.setName(bookDto.getName());
         book.setCategory(bookDto.getCategory());
+        book.setAuthor(author);
         book.setAvailableCopies(bookDto.getAvailableCopies());
 
-        Author author = this.authorRepository.findById(bookDto.getAuthor()).orElseThrow(() -> new AuthorNotFoundException(bookDto.getAuthor()));
-        book.setAuthor(author);
-
-        this.bookRepository.save(book);
-        return Optional.of(book);
+        return Optional.of(this.bookRepository.save(book));
     }
 
     @Override
@@ -100,33 +67,17 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<Book> markAsTaken(Long id,String name, Category category, Long authorId, Integer availableCopies) {
-        Book book = this.bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-
-        book.setName(name);
-        book.setCategory(category);
-        book.setAvailableCopies(availableCopies - 1);
-        Author author = this.authorRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException(authorId));
-        book.setAuthor(author);
-
+    public Optional<Book> take(Long id) {
+        Book book = this.bookRepository.findById(id)
+                .orElseThrow(BookNotFoundException::new);
+        int copies;
+        if (book.getAvailableCopies() > 0) {
+            copies = book.getAvailableCopies() - 1;
+        } else {
+            copies = book.getAvailableCopies();
+        }
+        book.setAvailableCopies(copies);
         this.bookRepository.save(book);
         return Optional.of(book);
     }
-
-    @Override
-    public Optional<Book> markAsTaken(Long id, BookDto bookDto) {
-        Book book = this.bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-
-        book.setName(bookDto.getName());
-        book.setCategory(bookDto.getCategory());
-        book.setAvailableCopies(bookDto.getAvailableCopies() - 1);
-        Author author = this.authorRepository.findById(bookDto.getAuthor()).orElseThrow(() -> new AuthorNotFoundException(bookDto.getAuthor()));
-        book.setAuthor(author);
-
-        this.bookRepository.save(book);
-        return Optional.of(book);
-    }
-
-
-
 }

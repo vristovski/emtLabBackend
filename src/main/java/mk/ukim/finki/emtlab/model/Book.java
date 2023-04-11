@@ -2,14 +2,18 @@ package mk.ukim.finki.emtlab.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import mk.ukim.finki.emtlab.model.enumerations.Category;
 
 @Data
 @Entity
+@NoArgsConstructor
 public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -17,10 +21,8 @@ public class Book {
 
     @ManyToOne
     private Author author;
-    private Integer availableCopies;
 
-    public Book() {
-    }
+    private Integer availableCopies;
 
     public Book(String name, Category category, Author author, Integer availableCopies) {
         this.name = name;
