@@ -14,7 +14,7 @@ import java.util.Optional;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://emtlabfrontend.herokuapp.com/")
 @RequestMapping("/api/books")
 @AllArgsConstructor
 public class BookRestController {
