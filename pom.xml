@@ -15,8 +15,8 @@
     <description>backend</description>
     <properties>
         <java.version>1.8</java.version>
-        <maven.compiler.source>3</maven.compiler.source>
-        <maven.compiler.target>3</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <dependencies>
         <dependency>
